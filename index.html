@@ -638,7 +638,7 @@ body::before {
 </footer>
 
 <script>
-const DATA_URL = 'data/projects.json';
+const DATA_URL = 'data/projects.json?v=' + Date.now();
 const esc = s => String(s)
   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const $ = id => document.getElementById(id);
