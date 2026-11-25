@@ -1,0 +1,808 @@
+<title>Jonathan Pattara · TAK Developer</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.6.2/fuse.min.js"></script>
+
+<style>
+/* ── Tokens ────────────────────────────────────────────────────
+   Layout: identity hero → sticky context tabs → search + cards
+   Three context colors: Parsons (blue), CAP (amber), Personal (green)
+─────────────────────────────────────────────────────────────── */
+:root {
+  --bg:        #090d14;
+  --bg-2:      #0d1420;
+  --surface:   #131b27;
+  --surface-2: #1a2436;
+  --surface-h: #223047;
+  --border:    #1f2d42;
+  --border-2:  #2a3d58;
+
+  --text:   #e8eef5;
+  --text-m: #7a8fa8;
+  --text-s: #3d5068;
+
+  /* context colors */
+  --parsons:     #38bdf8;   /* sky blue — corporate */
+  --parsons-bg:  #071e36;
+  --parsons-mid: #0f3356;
+  --cap:         #f59e0b;   /* amber — civil air patrol */
+  --cap-bg:      #2d1a00;
+  --cap-mid:     #4a2c00;
+  --personal:    #34d399;   /* emerald — own work */
+  --personal-bg: #022a1a;
+  --personal-mid:#053d26;
+
+  --ok:   #34d399;
+  --warn: #f59e0b;
+  --dim:  #4a5568;
+
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f0f4f8; --bg-2: #e8edf4; --surface: #fff; --surface-2: #f0f4f8;
+    --surface-h: #e2e8f0; --border: #cbd5e0; --border-2: #a0aec0;
+    --text: #1a202c; --text-m: #4a5568; --text-s: #a0aec0;
+    --parsons: #0369a1; --parsons-bg: #e0f2fe; --parsons-mid: #bae6fd;
+    --cap: #b45309; --cap-bg: #fef3c7; --cap-mid: #fde68a;
+    --personal: #059669; --personal-bg: #d1fae5; --personal-mid: #a7f3d0;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f0f4f8; --bg-2: #e8edf4; --surface: #fff; --surface-2: #f0f4f8;
+  --surface-h: #e2e8f0; --border: #cbd5e0; --border-2: #a0aec0;
+  --text: #1a202c; --text-m: #4a5568; --text-s: #a0aec0;
+  --parsons: #0369a1; --parsons-bg: #e0f2fe; --parsons-mid: #bae6fd;
+  --cap: #b45309; --cap-bg: #fef3c7; --cap-mid: #fde68a;
+  --personal: #059669; --personal-bg: #d1fae5; --personal-mid: #a7f3d0;
+  color-scheme: light;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  padding-left:  max(16px, env(safe-area-inset-left,  0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+
+/* ── Hero ── */
+.hero {
+  border-bottom: 1px solid var(--border);
+  padding-block: 36px 28px;
+  background:
+    radial-gradient(ellipse 60% 40% at 70% 50%, rgba(56,189,248,.06) 0%, transparent 70%),
+    var(--bg);
+}
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.hero-left { min-width: 0; }
+.handle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-m);
+  letter-spacing: .02em;
+  margin-bottom: 10px;
+}
+.handle-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--personal);
+  box-shadow: 0 0 8px var(--personal);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+.hero h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(26px, 5vw, 40px);
+  font-weight: 700;
+  margin: 0 0 8px;
+  line-height: 1.1;
+  letter-spacing: -.02em;
+  color: var(--text);
+  text-wrap: balance;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--parsons), var(--personal));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  font-size: 14px;
+  color: var(--text-m);
+  margin: 0;
+  max-width: 480px;
+  line-height: 1.6;
+}
+.hero-tagline {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-m);
+  letter-spacing: .02em;
+  margin: 0 0 10px;
+}
+.contact-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-m);
+  text-decoration: none;
+  padding: 5px 11px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  transition: border-color .15s, color .15s;
+}
+.contact-link:hover { border-color: var(--personal); color: var(--personal); }
+.hero-stats {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--text-s);
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+.hero-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.btn-gh {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 15px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color .15s, background .15s;
+  white-space: nowrap;
+}
+.btn-gh:hover { border-color: var(--parsons); background: var(--parsons-mid); }
+.theme-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-m);
+  transition: border-color .15s;
+  flex-shrink: 0;
+}
+.theme-btn:hover { border-color: var(--personal); color: var(--personal); }
+
+/* ── Context tabs ── */
+.tabs-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 11;
+  background: var(--bg);
+}
+.tabs-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tabs-inner::-webkit-scrollbar { display: none; }
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-m);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+  white-space: nowrap;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  font-family: inherit;
+}
+.tab:hover { color: var(--text); }
+.tab-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+}
+.tab[data-ctx="all"] { }
+.tab[data-ctx="parsons"]  { }
+.tab[data-ctx="cap"]      { }
+.tab[data-ctx="personal"] { }
+.tab.active[data-ctx="all"]      { color: var(--text);     border-bottom-color: var(--text); }
+.tab.active[data-ctx="parsons"]  { color: var(--parsons);  border-bottom-color: var(--parsons); }
+.tab.active[data-ctx="cap"]      { color: var(--cap);      border-bottom-color: var(--cap); }
+.tab.active[data-ctx="personal"] { color: var(--personal); border-bottom-color: var(--personal); }
+.tab-count {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--text-m);
+}
+
+/* ── Search ── */
+.search-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-block: 20px 0;
+}
+.search-wrap { position: relative; }
+.search-ico {
+  position: absolute; left: 13px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-m); pointer-events: none;
+}
+#search {
+  width: 100%;
+  padding: 11px 42px 11px 40px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+#search::placeholder { color: var(--text-s); }
+#search:focus {
+  border-color: var(--personal);
+  box-shadow: 0 0 0 3px rgba(52,211,153,.12);
+}
+.search-clear {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none; color: var(--text-m);
+  cursor: pointer; padding: 2px; display: none; line-height: 1;
+}
+.search-clear.vis { display: block; }
+
+/* ── Results ── */
+.results-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding-block: 20px 60px;
+}
+.results-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  min-height: 22px;
+}
+#stats { font-size: 12px; color: var(--text-m); }
+
+/* ── Card grid ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+/* ── Card ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color .15s, transform .12s, box-shadow .15s;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 12px 0 0 12px;
+  background: var(--ctx-color, var(--border));
+  transition: width .15s;
+}
+.card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.card:hover::before { width: 4px; }
+.card[data-ctx="parsons"]  { --ctx-color: var(--parsons); }
+.card[data-ctx="parsons"]:hover  { border-color: var(--parsons); }
+.card[data-ctx="cap"]      { --ctx-color: var(--cap); }
+.card[data-ctx="cap"]:hover      { border-color: var(--cap); }
+.card[data-ctx="personal"] { --ctx-color: var(--personal); }
+.card[data-ctx="personal"]:hover { border-color: var(--personal); }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.ctx-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.ctx-badge.parsons  { color: var(--parsons);  background: var(--parsons-bg); }
+.ctx-badge.cap      { color: var(--cap);      background: var(--cap-bg); }
+.ctx-badge.personal { color: var(--personal); background: var(--personal-bg); }
+
+.status-pill {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.s-active   { color: var(--ok);   background: rgba(52,211,153,.12); }
+.s-wip      { color: var(--warn); background: rgba(245,158,11,.12); }
+.s-archived { color: var(--dim);  background: rgba(74,85,104,.2); }
+
+.card-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.25;
+  color: var(--text);
+  text-wrap: balance;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-s);
+  flex-wrap: wrap;
+}
+.card-meta span { display: flex; align-items: center; gap: 4px; }
+.card-desc {
+  font-size: 13px;
+  color: var(--text-m);
+  margin: 0;
+  flex: 1;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card-highlight {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-s);
+  margin: 0;
+  line-height: 1.5;
+  border-left: 2px solid var(--ctx-color, var(--border));
+  padding-left: 10px;
+}
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag {
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-s);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+}
+.plt-row { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.plt-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: var(--text-m);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.card-links { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: background .12s;
+}
+.link-gh {
+  color: var(--text-m);
+  border: 1px solid var(--border);
+}
+.link-gh:hover { border-color: var(--border-2); color: var(--text); }
+.link-demo {
+  border: 1px solid var(--personal);
+  color: var(--personal);
+}
+.link-demo:hover { background: var(--personal-bg); }
+
+/* ── Empty ── */
+.empty-state {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 56px 16px;
+  color: var(--text-m);
+}
+.empty-state p { font-size: 15px; margin: 0 0 8px; }
+
+/* ── Footer ── */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding-block: 18px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-s);
+}
+.site-footer a { color: var(--personal); text-decoration: none; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .hero-inner { flex-direction: column; }
+  .hero-actions { width: 100%; }
+  .card-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 26px; }
+}
+</style>
+
+<!-- ── HERO ── -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-left">
+      <div class="handle">
+        <span class="handle-dot"></span>
+        jpat-12
+      </div>
+      <h1>Jonathan <em>Pattara</em></h1>
+      <p class="hero-tagline">TAK Developer &nbsp;·&nbsp; Parsons Corporation &nbsp;·&nbsp; Civil Air Patrol ILWG</p>
+      <p class="hero-sub">
+        Building plugins and integrations across ATAK, WinTAK, CloudTAK, and WebTAK —
+        from enterprise Esri bridges to field-deployed CAP emergency services tools.
+      </p>
+      <div class="contact-row">
+        <a class="contact-link" href="https://github.com/jpat-12" target="_blank" rel="noopener">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          jpat-12
+        </a>
+        <a class="contact-link" href="https://www.linkedin.com/in/jonathan-pattara/" target="_blank" rel="noopener">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+        <a class="contact-link" href="mailto:jonathan@pattara.us">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          jonathan@pattara.us
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num" id="stat-total">—</span>
+          <span class="stat-label">Projects</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="stat-platforms">5</span>
+          <span class="stat-label">Platforms</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="stat-active">—</span>
+          <span class="stat-label">Active</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <a class="btn-gh" href="https://github.com/jpat-12" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        GitHub
+      </a>
+      <button class="theme-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">
+        <svg id="ico-sun"  width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg id="ico-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ── CONTEXT TABS ── -->
+<nav class="tabs-bar" aria-label="Project context">
+  <div class="tabs-inner">
+    <button class="tab active" data-ctx="all">
+      All <span class="tab-count" id="tc-all">0</span>
+    </button>
+    <button class="tab" data-ctx="parsons">
+      <span class="tab-dot" style="background:var(--parsons)"></span>
+      Parsons <span class="tab-count" id="tc-parsons">0</span>
+    </button>
+    <button class="tab" data-ctx="cap">
+      <span class="tab-dot" style="background:var(--cap)"></span>
+      CAP <span class="tab-count" id="tc-cap">0</span>
+    </button>
+    <button class="tab" data-ctx="personal">
+      <span class="tab-dot" style="background:var(--personal)"></span>
+      Personal <span class="tab-count" id="tc-personal">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<main>
+  <div class="search-section">
+    <div class="search-wrap">
+      <svg class="search-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search" type="search" autocomplete="off" spellcheck="false"
+             placeholder='Search projects… try "esri", "Vue", "UAS"'>
+      <button class="search-clear" id="search-clear" title="Clear">✕</button>
+    </div>
+  </div>
+
+  <div class="results-wrap">
+    <div class="results-bar">
+      <span id="stats"></span>
+    </div>
+    <div class="card-grid" id="grid">
+      <div class="empty-state"><p style="color:var(--text-s)">Loading…</p></div>
+    </div>
+  </div>
+</main>
+
+<!-- ── FOOTER ── -->
+<footer class="site-footer">
+  <a href="https://github.com/jpat-12" target="_blank" rel="noopener">Jonathan Pattara</a>
+  &nbsp;·&nbsp; TAK Developer
+</footer>
+
+<script>
+const DATA_URL = 'data/projects.json?v=' + Date.now();
+const esc = s => String(s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const $ = id => document.getElementById(id);
+
+let all = [];
+let fuse;
+let activeCtx = 'all';
+
+const fuseOpts = {
+  keys: [
+    { name: 'name',        weight: 2.5 },
+    { name: 'tags',        weight: 2.0 },
+    { name: 'description', weight: 1.5 },
+    { name: 'highlight',   weight: 1.0 },
+    { name: 'platforms',   weight: 1.0 },
+  ],
+  threshold: 0.35,
+  includeScore: true,
+  minMatchCharLength: 2,
+};
+
+const CTX_LABEL = { parsons:'Parsons', cap:'CAP', personal:'Personal' };
+const STATUS_LABEL = { active:'Active', wip:'In Progress', archived:'Archived' };
+const STATUS_CLASS = { active:'s-active', wip:'s-wip', archived:'s-archived' };
+
+async function load() {
+  try {
+    const r = await fetch(DATA_URL);
+    all = await r.json();
+  } catch { all = []; }
+  fuse = new Fuse(all, fuseOpts);
+  updateCounts();
+  updateStats();
+  refresh();
+}
+
+function updateCounts() {
+  $('stat-total').textContent  = all.length;
+  $('stat-active').textContent = all.filter(p => p.status === 'active').length;
+  $('tc-all').textContent      = all.length;
+  $('tc-parsons').textContent  = all.filter(p => p.context === 'parsons').length;
+  $('tc-cap').textContent      = all.filter(p => p.context === 'cap').length;
+  $('tc-personal').textContent = all.filter(p => p.context === 'personal').length;
+}
+
+function getResults() {
+  const q = $('search').value.trim();
+  let list = q.length >= 2
+    ? fuse.search(q).map(r => r.item)
+    : [...all];
+  if (activeCtx !== 'all')
+    list = list.filter(p => p.context === activeCtx);
+  return list;
+}
+
+function updateStats() {
+  const q = $('search').value.trim();
+  const list = getResults();
+  $('stats').textContent = q
+    ? `${list.length} result${list.length !== 1 ? 's' : ''} for "${q}"`
+    : list.length + ' of ' + all.length + ' projects';
+}
+
+function refresh() {
+  updateStats();
+  const list = getResults();
+  const grid = $('grid');
+
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty-state"><p>No projects match.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = list.map(p => {
+    const ctxLbl  = esc(CTX_LABEL[p.context] || p.context);
+    const sLbl    = esc(STATUS_LABEL[p.status] || p.status);
+    const sCls    = STATUS_CLASS[p.status] || 's-archived';
+    const tags    = (p.tags || []).slice(0, 6).map(t => `<span class="tag">${esc(t)}</span>`).join('');
+    const plts    = (p.platforms || []).map(pl => `<span class="plt-badge">${esc(pl)}</span>`).join('');
+    const ghLink  = p.url ? `<a href="${esc(p.url)}" class="link-btn link-gh" target="_blank" rel="noopener">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+      Code</a>` : '';
+    const demoLink = p.demo ? `<a href="${esc(p.demo)}" class="link-btn link-demo" target="_blank" rel="noopener">
+      Live →</a>` : '';
+    const highlight = p.highlight
+      ? `<p class="card-highlight">${esc(p.highlight)}</p>` : '';
+
+    return `<article class="card" data-ctx="${esc(p.context)}">
+      <div class="card-top">
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span class="ctx-badge ${esc(p.context)}">${ctxLbl}</span>
+          <span class="status-pill ${sCls}">${sLbl}</span>
+        </div>
+      </div>
+      <div>
+        <h2 class="card-name">${esc(p.name)}</h2>
+        <div class="card-meta">
+          <span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            ${esc(p.year)}
+          </span>
+          <span>${esc(p.role)}</span>
+        </div>
+      </div>
+      <p class="card-desc">${esc(p.description)}</p>
+      ${highlight}
+      <div class="card-tags">${tags}</div>
+      <div class="card-footer">
+        <div class="plt-row">${plts}</div>
+        <div class="card-links">${ghLink}${demoLink}</div>
+      </div>
+    </article>`;
+  }).join('');
+}
+
+/* ── Tabs ── */
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    activeCtx = btn.dataset.ctx;
+    refresh();
+  });
+});
+
+/* ── Search ── */
+let debounce;
+$('search').addEventListener('input', () => {
+  clearTimeout(debounce);
+  debounce = setTimeout(() => {
+    $('search-clear').classList.toggle('vis', $('search').value.length > 0);
+    refresh();
+  }, 100);
+});
+$('search-clear').addEventListener('click', () => {
+  $('search').value = '';
+  $('search-clear').classList.remove('vis');
+  refresh();
+  $('search').focus();
+});
+
+/* ── Theme ── */
+(function() {
+  const root = document.documentElement;
+  const btn  = $('theme-toggle');
+  const sun  = $('ico-sun');
+  const moon = $('ico-moon');
+  let theme  = '';
+  try { theme = localStorage.getItem('tak-port:theme') || ''; } catch {}
+  function apply(t) {
+    theme = t;
+    if (t) root.setAttribute('data-theme', t);
+    else root.removeAttribute('data-theme');
+    const dark = t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme:dark)').matches);
+    sun.style.display  = dark ? 'block' : 'none';
+    moon.style.display = dark ? 'none' : 'block';
+    try { if (t) localStorage.setItem('tak-port:theme', t); else localStorage.removeItem('tak-port:theme'); } catch {}
+  }
+  btn.addEventListener('click', () => {
+    const dark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme:dark)').matches);
+    apply(dark ? 'light' : 'dark');
+  });
+  apply(theme);
+})();
+
+load();
+</script>
